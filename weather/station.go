@@ -29,6 +29,7 @@ type Station interface {
 	ReadTemperature() (float64, error)
 	ReadPressure() (float64, error)
 	ToggleLED()
+	GetLedState() bool
 	Display(value float64) error
 	Start()
 	Stop()
@@ -86,7 +87,7 @@ func (ws *WeatherStation) Start() {
 			fmt.Println("Error displaying value %v", err)
 		}
 
-		ws.ToggleLED()
+		// ws.ToggleLED()
 		<-ws.ticker.C
 	}
 }
@@ -101,6 +102,10 @@ func (ws *WeatherStation) ReadTemperature() (float64, error) {
 
 func (ws *WeatherStation) ReadPressure() (float64, error) {
 	return ws.environmentSensor.ReadPressure()
+}
+
+func (ws *WeatherStation) GetLedState() bool {
+	return ws.led.GetCurrentState()
 }
 
 func (ws *WeatherStation) ToggleLED() {

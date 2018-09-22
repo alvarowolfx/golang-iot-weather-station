@@ -30,6 +30,7 @@ func NewHttpWeatherStation(station weather.Station, port string) *HttpWeatherSta
 
 func (hw *HttpWeatherStation) Start() {
 	weatherURL := fmt.Sprintf("/station/weather")
+	ledURL := fmt.Sprintf("/station/led/toggle")
 
 	http.HandleFunc(weatherURL, func(res http.ResponseWriter, req *http.Request) {
 		temperature, _ := hw.station.ReadTemperature()
@@ -40,6 +41,18 @@ func (hw *HttpWeatherStation) Start() {
 			State: map[string]string{
 				"temperature": fmt.Sprintf("%2.2f", temperature),
 				"pressure":    fmt.Sprintf("%2.2f", pressure),
+			},
+		})
+	})
+
+	http.HandleFunc(ledURL, func(res http.ResponseWriter, req *http.Request) {
+		ledStatus := hw.station.GetLedState()
+		hw.station.ToggleLED()
+
+		json.NewEncoder(res).Encode(HttpResponse{
+			Message: "ok",
+			State: map[string]string{
+				"led": fmt.Sprintf("%s", ledStatus),
 			},
 		})
 	})
